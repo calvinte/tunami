@@ -1,13 +1,14 @@
 var tunami = tunami || {};
 
 tunami.controller = function($scope) {
+  var audio = _.first(document.getElementsByTagName('audio'));
   $scope.songs = [];
   $scope.playing = {};
   $scope.addSong = function() {
     var ChooseEntryOptions = {
       type: 'openFile',
       accepts: [{
-        extensions: ['mp3', 'm4a', 'aac', 'mp4', 'ogg']
+        extensions: ['m4p', 'mp3', 'm4a', 'aac', 'mp4', 'ogg']
       }]
     };
     chrome.fileSystem.chooseEntry(ChooseEntryOptions, function(fileEntry){
@@ -15,6 +16,7 @@ tunami.controller = function($scope) {
         var extension = _.last(fileEntry.name.split('.'));
         var audioTypes = {
           m4a: 'audio/mpeg',
+          m4p: 'audio/mpeg',
           aac: 'audio/mpeg',
           mp4: 'audio/mpeg',
           mp3: 'audio/mpeg',
@@ -38,19 +40,24 @@ tunami.controller = function($scope) {
     });
 
     // If the song we removed is currently playing, reset the active song.
+    console.log($scope.playing, song);
     if ($scope.playing === song) $scope.setActiveSong();
   }
   $scope.setActiveSong = function(song) {
-    var audio = document.getElementsByTagName('audio')[0];
     var element = document.createElement('source');
+
+    // Stop any audio from playing, and remove all sources.
     audio.pause();
     audio.innerHTML = '';
-    if (!song) return;
 
-    $scope.playing = song;
+    if (!song) return;
     element.type = song.source.type;
     element.src = song.source.src;
+
+    // Add our source, start playing, and create a reference in $scope.
     audio.appendChild(element);
+    audio.play();
+    $scope.playing = song;
   }
 }
 

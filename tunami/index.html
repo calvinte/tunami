@@ -7,13 +7,13 @@
     <script src="src/main.js"></script>
   </head>
   <body ng-csp ng-controller="tunami.controller">
+    <button ng-click="addSong()">Add Song</button>
     <ul>
       <li ng-repeat="song in songs">
         <a ng-click="setActiveSong(song)">{{song.name}}</a>
         <a ng-click="removeSong(song)">x</a>
       </li>
     </ul>
-    <button ng-click="addSong()">Add Song</button>
     <audio controls />
   </body>
 </html>
