@@ -28,21 +28,8 @@ tunami.controller = function($scope) {
       }]
     };
     chrome.fileSystem.chooseEntry(ChooseEntryOptions, function(file) {
-      tunami.utility.unpackZipFromFile(file, function(zip) {
-        var i, extension, type, blob, url, song;
-        for (i in zip.files) {
-          file = zip.files[i];
-          if (!file.data.length) continue;
-          extension = tunami.utility.getExtensionFromFileName(file.name);
-          type = tunami.utility.getMimeTypeFromExtension(extension);
-          blob = new Blob([file.asArrayBuffer()], {type: type});
-          url = tunami.utility.getBlobAsDataUrl(blob);
-          try {
-            song = new tunami.Song(file.name, url, extension);
-            $scope.songs.push(song);
-          } catch(e) {
-          }
-        }
+      tunami.utility.unpackSongsFromZip(file, function(songs) {
+        $scope.songs = _.union($scope.songs, songs);
         $scope.$apply();
       });
     });

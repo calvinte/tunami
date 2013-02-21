@@ -1,5 +1,4 @@
 var tunami = tunami || {};
-window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
 
 tunami.utility = {
   extensions: ['m4p', 'mp3', 'm4a', 'aac', 'mp4', 'ogg'],
@@ -21,10 +20,25 @@ tunami.utility = {
       reader.readAsBinaryString(file);
     });
   },
-  unpackZipFromFile: function unpackZip(file, callback) {
+  unpackSongsFromZip: function unpackZip(file, callback) {
     tunami.utility.getFileAsBlob(file, function(blob) {
-      var zip = new JSZip(blob);
-      callback(zip);
+      var worker = new Worker('../src/worker.unpackZip.js');
+      worker.addEventListener('message', function(e) {
+        var i, file, song, songs, url;
+        if (e.data.message == 'complete') {
+          songs = [];
+          for (i in e.data.zip.files) {
+            file = e.data.zip.files[i];
+            url = tunami.utility.getBlobAsDataUrl(file.blob);
+            try {
+              song = new tunami.Song(file.name, url, file.extension);
+              songs.push(song);
+            } catch(e) {}
+          }
+          callback(songs);
+        }
+      }, false);
+      worker.postMessage({blob: blob});
     });
   },
   getExtensionFromFileName: function getExtensionFromFileName(string) {
