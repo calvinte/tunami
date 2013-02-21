@@ -8,28 +8,41 @@ tunami.controller = function($scope) {
     var ChooseEntryOptions = {
       type: 'openFile',
       accepts: [{
-        extensions: ['m4p', 'mp3', 'm4a', 'aac', 'mp4', 'ogg']
+        extensions: tunami.utility.extensions
       }]
     };
-    chrome.fileSystem.chooseEntry(ChooseEntryOptions, function(fileEntry){
-      tunami.utility.getFileAsDataURL(fileEntry, function(url) {
-        var extension = _.last(fileEntry.name.split('.'));
-        var audioTypes = {
-          m4a: 'audio/mpeg',
-          m4p: 'audio/mpeg',
-          aac: 'audio/mpeg',
-          mp4: 'audio/mpeg',
-          mp3: 'audio/mpeg',
-          ogg: 'audio/ogg'
+    chrome.fileSystem.chooseEntry(ChooseEntryOptions, function(file) {
+      tunami.utility.getFileAsDataURL(file, function(url) {
+        var extension = tunami.utility.getExtensionFromFileName(file.name);
+        var song = new tunami.Song(file.name, url, extension);
+        $scope.songs.push(song);
+        $scope.$apply();
+      });
+    });
+  }
+  $scope.addZip = function() {
+    var ChooseEntryOptions = {
+      type: 'openFile',
+      accepts: [{
+        extensions: ['zip']
+      }]
+    };
+    chrome.fileSystem.chooseEntry(ChooseEntryOptions, function(file) {
+      tunami.utility.unpackZipFromFile(file, function(zip) {
+        var i, extension, type, blob, url, song;
+        for (i in zip.files) {
+          file = zip.files[i];
+          if (!file.data.length) continue;
+          extension = tunami.utility.getExtensionFromFileName(file.name);
+          type = tunami.utility.getMimeTypeFromExtension(extension);
+          blob = new Blob([file.asArrayBuffer()], {type: type});
+          url = tunami.utility.getBlobAsDataUrl(blob);
+          try {
+            song = new tunami.Song(file.name, url, extension);
+            $scope.songs.push(song);
+          } catch(e) {
+          }
         }
-        var source = {
-          type: audioTypes[extension],
-          src: url
-        };
-        $scope.songs.push({
-          name: fileEntry.name,
-          source: source
-        });
         $scope.$apply();
       });
     });
@@ -40,7 +53,6 @@ tunami.controller = function($scope) {
     });
 
     // If the song we removed is currently playing, reset the active song.
-    console.log($scope.playing, song);
     if ($scope.playing === song) $scope.setActiveSong();
   }
   $scope.setActiveSong = function(song) {

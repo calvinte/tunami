@@ -8,6 +8,7 @@
   </head>
   <body ng-csp ng-controller="tunami.controller">
     <button ng-click="addSong()">Add Song</button>
+    <button ng-click="addZip()">Add Zip</button>
     <ul>
       <li ng-repeat="song in songs">
         <a ng-click="setActiveSong(song)">{{song.name}}</a>
