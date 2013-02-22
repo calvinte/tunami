@@ -22,7 +22,7 @@ tunami.utility = {
       reader.readAsBinaryString(file);
     });
   },
-  getEntryFile: function(entry, callback) {
+  getZipEntryAsDataURL: function(entry, callback, progress) {
     var writer, zipFileEntry;
 
     var tmpFilename = '_tmp' + entry.crc32;
@@ -34,7 +34,9 @@ tunami.utility = {
             entry.getData(writer, function(blob) {
               var blobURL = zipFile.toURL();
               callback(blobURL);
-          });
+            }, function(current, total) {
+              if (progress) progress(Math.round(current / total * 100) + '% ' + entry.filename);
+            });
         });
       }
 
@@ -46,9 +48,6 @@ tunami.utility = {
   unpackSongsFromZip: function unpackZip(file, callback) {
     zip.createReader(new zip.BlobReader(file), function(zipReader) {
       zipReader.getEntries(function(entries) {
-        var count = entries.length,
-            songs = [],
-            check = function() { if (count == songs.length) callback(songs) }
         entries.forEach(function(entry) {
           var name, type, extension, valid;
           name = entry.filename;
@@ -62,21 +61,14 @@ tunami.utility = {
             entries = _.reject(entries, function(value) { 
               return value === entry;
             });
-            count--;
             return;
           }
 
           extension = tunami.utility.getExtensionFromFileName(name);
-          tunami.utility.getEntryFile(entry, function(url) {
-            try {
-              song = new tunami.Song(name, url, extension);
-              songs.push(song);
-              check();
-            } catch(e) {
-              count--;
-              check();
-            }
-          });
+          try {
+            song = new tunami.Song(name, entry, extension);
+            callback(song);
+          } catch(e) {}
         });
       });
     });

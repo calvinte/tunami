@@ -1,13 +1,14 @@
 <!doctype html>
 <html ng-app>
   <head>
+    <link href="styles/main.css" rel="stylesheet" />
     <script src="lib/underscore.min.js"></script>
     <script src="lib/angular.min.js"></script>
     <script src="src/controller.js"></script>
     <script src="src/main.js"></script>
   </head>
   <body ng-csp ng-controller="tunami.controller">
-    <button ng-click="addSong()">Add Song</button>
+    <p>&nbsp;{{progress}}</p>
     <label>Add Zip: 
       <input ng-click="addZip()" ng-model="zip" type="file" accept="application/zip">
     </label>
