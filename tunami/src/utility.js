@@ -1,4 +1,6 @@
 var tunami = tunami || {};
+var requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+zip.workerScriptsPath = '../lib/zip/';
 
 tunami.utility = {
   extensions: ['m4p', 'mp3', 'm4a', 'aac', 'mp4', 'ogg'],
@@ -20,25 +22,63 @@ tunami.utility = {
       reader.readAsBinaryString(file);
     });
   },
+  getEntryFile: function(entry, callback) {
+    var writer, zipFileEntry;
+
+    var tmpFilename = '_tmp' + entry.crc32;
+    requestFileSystem(TEMPORARY, 4 * 1024 * 1024 * 1024, function(filesystem) {
+      function create() {
+        filesystem.root.getFile(tmpFilename, {create : true},
+          function(zipFile) {
+            writer = new zip.FileWriter(zipFile);
+            entry.getData(writer, function(blob) {
+              var blobURL = zipFile.toURL();
+              callback(blobURL);
+          });
+        });
+      }
+
+      filesystem.root.getFile(tmpFilename, null, function(entry) {
+        entry.remove(create, create);
+      }, create);
+    });
+  },
   unpackSongsFromZip: function unpackZip(file, callback) {
-    tunami.utility.getFileAsBlob(file, function(blob) {
-      var worker = new Worker('../src/worker.unpackZip.js');
-      worker.addEventListener('message', function(e) {
-        var i, file, song, songs, url;
-        if (e.data.message == 'complete') {
-          songs = [];
-          for (i in e.data.zip.files) {
-            file = e.data.zip.files[i];
-            url = tunami.utility.getBlobAsDataUrl(file.blob);
-            try {
-              song = new tunami.Song(file.name, url, file.extension);
-              songs.push(song);
-            } catch(e) {}
+    zip.createReader(new zip.BlobReader(file), function(zipReader) {
+      zipReader.getEntries(function(entries) {
+        var count = entries.length,
+            songs = [],
+            check = function() { if (count == songs.length) callback(songs) }
+        entries.forEach(function(entry) {
+          var name, type, extension, valid;
+          name = entry.filename;
+
+          // Ignore dotfiles and paths that include `__`.
+          valid = name.indexOf('.') != 0;
+          valid = valid && name.indexOf('__') != 0;
+          valid = valid && name.indexOf('/.') == -1;
+          if (!valid) {
+            // Cut file from entries.
+            entries = _.reject(entries, function(value) { 
+              return value === entry;
+            });
+            count--;
+            return;
           }
-          callback(songs);
-        }
-      }, false);
-      worker.postMessage({blob: blob});
+
+          extension = tunami.utility.getExtensionFromFileName(name);
+          tunami.utility.getEntryFile(entry, function(url) {
+            try {
+              song = new tunami.Song(name, url, extension);
+              songs.push(song);
+              check();
+            } catch(e) {
+              count--;
+              check();
+            }
+          });
+        });
+      });
     });
   },
   getExtensionFromFileName: function getExtensionFromFileName(string) {

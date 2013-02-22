@@ -8,6 +8,11 @@
       "scripts" : [
         "lib/underscore.min.js",
         "lib/Class.js",
+        "lib/zip/zip.js",
+        "lib/zip/zip-fs.js",
+        "lib/zip/mime-types.js",
+        "lib/zip/inflate.js",
+        "lib/zip/deflate.js",
         "src/background.js",
         "src/utility.js",
         "src/Song.js"

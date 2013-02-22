@@ -21,17 +21,13 @@ tunami.controller = function($scope) {
     });
   }
   $scope.addZip = function() {
-    var ChooseEntryOptions = {
-      type: 'openFile',
-      accepts: [{
-        extensions: ['zip']
-      }]
-    };
-    chrome.fileSystem.chooseEntry(ChooseEntryOptions, function(file) {
-      tunami.utility.unpackSongsFromZip(file, function(songs) {
+    event.target.addEventListener('change', function() {
+      var files = this.files;
+      tunami.utility.unpackSongsFromZip(files[0], function(songs) {
         $scope.songs = _.union($scope.songs, songs);
         $scope.$apply();
       });
+      this.removeEventListener('change', arguments.callee.caller);
     });
   }
   $scope.removeSong = function(song) {
