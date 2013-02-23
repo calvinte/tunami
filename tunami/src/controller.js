@@ -2,16 +2,16 @@ var tunami = tunami || {};
 
 tunami.controller = function($scope) {
   var audio = _.first(document.getElementsByTagName('audio'));
-  $scope.songs = [];
+  $scope.lists = [];
   $scope.playing = {};
   $scope.addZip = function() {
     event.target.addEventListener('change', function() {
       var files = this.files;
-      tunami.utility.unpackSongsFromZip(files[0], function(song) {
-        $scope.songs.push(song);
+      tunami.utility.loadZipAsList(files[0], function(list) {
+        $scope.lists.push(list);
         $scope.$apply();
       });
-      this.removeEventListener('change', arguments.callee.caller);
+      this.removeEventListener('change', arguments.callee);
     });
   }
   $scope.removeSong = function(song) {

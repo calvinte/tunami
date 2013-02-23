@@ -15,7 +15,8 @@
         "lib/zip/deflate.js",
         "src/background.js",
         "src/utility.js",
-        "src/Song.js"
+        "src/Song.js",
+        "src/List.js"
       ]
     }
   },

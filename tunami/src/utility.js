@@ -37,9 +37,9 @@ tunami.utility = {
       });
     });
   },
-  unpackSongsFromZip: function unpackZip(file, callback) {
+  loadZipAsList: function unpackZip(file, callback) {
     tunami.utility.readZip(file, function(entries) {
-      var i;
+      var i, songs = [], list;
       for (i in entries) {
         var entry, name, type, extension;
         entry = entries[i];
@@ -47,9 +47,11 @@ tunami.utility = {
 
         try {
           song = new tunami.Song(name, entry);
-          callback(song);
+          songs.push(song);
         } catch(e) {}
       }
+      list = new tunami.List(file.name, songs);
+      callback(list);
     });
   },
   getExtensionFromFileName: function getExtensionFromFileName(string) {

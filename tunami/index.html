@@ -9,13 +9,19 @@
   </head>
   <body ng-csp ng-controller="tunami.controller">
     <p>&nbsp;{{progress}}</p>
-    <label>Add Zip: 
+    <label>Add List: 
       <input ng-click="addZip()" ng-model="zip" type="file" accept="application/zip">
     </label>
+    <h3>Lists</h3>
     <ul>
-      <li ng-repeat="song in songs">
-        <a ng-click="setActiveSong(song)">{{song.name}}</a>
-        <a ng-click="removeSong(song)">x</a>
+      <li ng-repeat="list in lists">
+        <strong>{{list.name}}</strong>
+        <ul>
+          <li ng-repeat="song in list.songs">
+            <a ng-click="setActiveSong(song)">{{song.name}}</a>
+            <a ng-click="removeSong(song)">x</a>
+          </li>
+        </ul>
       </li>
     </ul>
     <audio controls />
