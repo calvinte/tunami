@@ -14,13 +14,19 @@ tunami.controller = function($scope) {
       this.removeEventListener('change', arguments.callee);
     });
   }
-  $scope.removeSong = function(song) {
-    $scope.songs = _.reject($scope.songs, function(value) {
-      return value === song;
-    });
+  $scope.removeList = function(List) {
+    // @TODO better way of managing lists, we shouldn't have to do data
+    // manipulation like this in the controller.
+    for (var i in List.songs) {
+      if ($scope.playing === List.songs[i]) $scope.setActiveSong();
+    }
+    $scope.lists = _.reject($scope.lists, function(v) { return v === List });
+  }
+  $scope.removeSong = function(Song, List) {
+    List.removeSong(Song);
 
     // If the song we removed is currently playing, reset the active song.
-    if ($scope.playing === song) $scope.setActiveSong();
+    if ($scope.playing === Song) $scope.setActiveSong();
   }
   $scope.setActiveSong = function(song) {
     var element = document.createElement('source');
@@ -28,6 +34,8 @@ tunami.controller = function($scope) {
     // Stop any audio from playing, and remove all sources.
     audio.pause();
     audio.innerHTML = '';
+    if (audio.currentTime) audio.currentTime = 0;
+    audio.load();
     if (!song) return;
 
     song.play(audio, element, _.throttle(function(current, total) {
