@@ -30,8 +30,9 @@ tunami.controller = function($scope) {
     audio.innerHTML = '';
     if (!song) return;
 
-    song.play(audio, element, _.throttle(function(progress) {
-      $scope.progress = progress;
+    song.play(audio, element, _.throttle(function(current, total) {
+      var percent = Math.round(current / total * 100) + '% ';
+      $scope.progress = percent + song.name;
       $scope.$apply();
     }, 250), function() { return song === $scope.playing });
 

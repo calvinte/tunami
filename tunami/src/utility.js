@@ -4,73 +4,52 @@ zip.workerScriptsPath = '../lib/zip/';
 
 tunami.utility = {
   extensions: ['m4p', 'mp3', 'm4a', 'aac', 'mp4', 'ogg'],
-  getFileAsDataURL: function getFileAsDataURL(file, callback) {
-    file.file(function(file) {
-      var reader = new FileReader();
-      reader.onload = function(e) { callback(e.target.result) };
-      reader.readAsDataURL(file);
-    });
-  },
-  getBlobAsDataUrl: function getBlobAsDataUrl(blob) {
-    var url = URL.createObjectURL(blob);
-    return url;
-  },
-  getFileAsBlob: function getFileAsBlob(file, callback) {
-    file.file(function(file) {
-      var reader = new FileReader();
-      reader.onload = function(e) { callback(e.target.result) };
-      reader.readAsBinaryString(file);
-    });
-  },
-  getZipEntryAsDataURL: function(entry, callback, progress) {
-    var writer, zipFileEntry;
-
-    var tmpFilename = '_tmp' + entry.crc32;
-    requestFileSystem(TEMPORARY, 4 * 1024 * 1024 * 1024, function(filesystem) {
-      function create() {
-        filesystem.root.getFile(tmpFilename, {create : true},
-          function(zipFile) {
-            writer = new zip.FileWriter(zipFile);
-            entry.getData(writer, function(blob) {
-              var blobURL = zipFile.toURL();
-              callback(blobURL);
-            }, function(current, total) {
-              if (progress) progress(Math.round(current / total * 100) + '% ' + entry.filename);
-            });
+  fsSize: 4 * 1024 * 1024 * 1024,
+  getZipEntryAsDataURL: function getZipEntryAsDataURL(zipEntry, callback, progress) {
+    var tmp = '_tmp' + zipEntry.crc32;
+    requestFileSystem(TEMPORARY, tunami.utility.fsSize, function(fs) {
+      function createFile() {
+        fs.root.getFile(tmp, {create : true}, function(zipFile) {
+          var writer = new zip.FileWriter(zipFile);
+          var complete = function(blob) { callback(zipFile.toURL()) };
+          zipEntry.getData(writer, complete, progress);
         });
       }
 
-      filesystem.root.getFile(tmpFilename, null, function(entry) {
-        entry.remove(create, create);
-      }, create);
+      fs.root.getFile(tmp, null, function(fileEntry) {
+        fileEntry.remove(createFile, createFile);
+      }, createFile);
+    });
+  },
+  confirmValidFileName: function confirmValidFileName(name) {
+    var valid;
+
+    // Ignore dotfiles and paths that include `__`.
+    valid = name.indexOf('.') != 0;
+    valid = valid && name.indexOf('__') != 0;
+    valid = valid && name.indexOf('/.') == -1;
+    return valid;
+  },
+  readZip: function readZip(file, callback) {
+    zip.createReader(new zip.BlobReader(file), function(zipReader) {
+      zipReader.getEntries(function(entries) {
+        callback(entries);
+      });
     });
   },
   unpackSongsFromZip: function unpackZip(file, callback) {
-    zip.createReader(new zip.BlobReader(file), function(zipReader) {
-      zipReader.getEntries(function(entries) {
-        entries.forEach(function(entry) {
-          var name, type, extension, valid;
-          name = entry.filename;
+    tunami.utility.readZip(file, function(entries) {
+      var i;
+      for (i in entries) {
+        var entry, name, type, extension;
+        entry = entries[i];
+        name = entry.filename;
 
-          // Ignore dotfiles and paths that include `__`.
-          valid = name.indexOf('.') != 0;
-          valid = valid && name.indexOf('__') != 0;
-          valid = valid && name.indexOf('/.') == -1;
-          if (!valid) {
-            // Cut file from entries.
-            entries = _.reject(entries, function(value) { 
-              return value === entry;
-            });
-            return;
-          }
-
-          extension = tunami.utility.getExtensionFromFileName(name);
-          try {
-            song = new tunami.Song(name, entry, extension);
-            callback(song);
-          } catch(e) {}
-        });
-      });
+        try {
+          song = new tunami.Song(name, entry);
+          callback(song);
+        } catch(e) {}
+      }
     });
   },
   getExtensionFromFileName: function getExtensionFromFileName(string) {
