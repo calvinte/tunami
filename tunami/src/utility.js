@@ -39,19 +39,9 @@ tunami.utility = {
   },
   loadZipAsList: function unpackZip(file, callback) {
     tunami.utility.readZip(file, function(entries) {
-      var i, songs = [], list;
-      for (i in entries) {
-        var entry, name, type, extension;
-        entry = entries[i];
-        name = entry.filename;
-
-        try {
-          song = new tunami.Song(name, entry);
-          songs.push(song);
-        } catch(e) {}
-      }
-      list = new tunami.List(file.name, songs);
-      callback(list);
+      List = new tunami.List(file.name);
+      List.importZip(entries);
+      callback(List);
     });
   },
   getExtensionFromFileName: function getExtensionFromFileName(string) {
