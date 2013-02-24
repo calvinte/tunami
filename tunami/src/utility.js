@@ -9,7 +9,7 @@ tunami.utility = {
     var tmp = '_tmp' + zipEntry.crc32;
     requestFileSystem(TEMPORARY, tunami.utility.fsSize, function(fs) {
       function createFile() {
-        fs.root.getFile(tmp, {create : true}, function(zipFile) {
+        fs.root.getFile(tmp, {create: true}, function(zipFile) {
           var writer = new zip.FileWriter(zipFile);
           var complete = function(blob) { callback(zipFile.toURL()) };
           zipEntry.getData(writer, complete, progress);
@@ -38,11 +38,8 @@ tunami.utility = {
     });
   },
   loadZipAsList: function unpackZip(file, callback) {
-    tunami.utility.readZip(file, function(entries) {
-      List = new tunami.List(file.name);
-      List.importZip(entries);
-      callback(List);
-    });
+    List = new tunami.List(file.name);
+    List.importZip(file, callback);
   },
   getExtensionFromFileName: function getExtensionFromFileName(string) {
     return _.last(string.split('.'));

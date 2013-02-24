@@ -16,7 +16,8 @@
         "src/background.js",
         "src/utility.js",
         "src/Song.js",
-        "src/List.js"
+        "src/List.js",
+        "src/library.js"
       ]
     }
   },

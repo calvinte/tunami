@@ -2,7 +2,9 @@ var tunami = tunami || {};
 
 tunami.controller = function($scope) {
   var audio = _.first(document.getElementsByTagName('audio'));
+  var render = function() { if (!$scope.$$phase) $scope.$apply() }
   $scope.lists = tunami._lists;
+  $scope.library = tunami.library;
   $scope.playing = {};
   $scope.playingFrom = {};
   $scope.addZip = function() {
@@ -10,7 +12,7 @@ tunami.controller = function($scope) {
       var files = this.files;
       tunami.utility.loadZipAsList(files[0], function(List) {
         List.activate();
-        $scope.$apply();
+        render();
       });
       this.removeEventListener('change', arguments.callee);
     });
@@ -18,6 +20,8 @@ tunami.controller = function($scope) {
   $scope.removeList = function(List) {
     if ($scope.playingFrom === List) $scope.setActiveSong();
     List.destroy();
+    $scope.lists = tunami._lists;
+    render();
   }
   $scope.removeSong = function(Song, List) {
     List.removeSong(Song);
@@ -43,7 +47,7 @@ tunami.controller = function($scope) {
     Song.play(audio, element, _.throttle(function(current, total) {
       var percent = Math.round(current / total * 100) + '% ';
       $scope.progress = percent + Song.name;
-      $scope.$apply();
+      render();
     }, 250), function() { return Song === $scope.playing });
   }
 }

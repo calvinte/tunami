@@ -17,6 +17,7 @@
       <li ng-repeat="List in lists">
         <strong ng-click="activateList(List)">{{List.name}}</strong>
         <a ng-click="removeList(List)">Eject</a>
+        <a ng-click="library.importList(List)">Import to Library</a>
         <ul ng-show="List.active">
           <li ng-repeat="Song in List.songs">
             <a ng-click="setActiveSong(Song, List)">{{Song.name}}</a>
