@@ -2,7 +2,7 @@ var tunami = tunami || {};
 
 tunami.Song = Class.extend({
   init: function(name, entry) {
-    var extension = tunami.utility.getExtensionFromFileName(name);
+   var extension = tunami.utility.getExtensionFromFileName(name);
     if (tunami.utility.extensions.indexOf(extension) == -1) {
       throw new Error('Unacceptable extension');
     }

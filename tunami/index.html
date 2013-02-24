@@ -15,12 +15,12 @@
     <h3>Lists</h3>
     <ul>
       <li ng-repeat="List in lists">
-        <strong>{{List.name}}</strong>
+        <strong ng-click="activateList(List)">{{List.name}}</strong>
         <a ng-click="removeList(List)">Eject</a>
-        <ul>
+        <ul ng-show="List.active">
           <li ng-repeat="Song in List.songs">
-            <a ng-click="setActiveSong(Song)">{{Song.name}}</a>
-            <a ng-click="removeSong(Song)">x</a>
+            <a ng-click="setActiveSong(Song, List)">{{Song.name}}</a>
+            <a ng-click="removeSong(Song, List)">x</a>
           </li>
         </ul>
       </li>
