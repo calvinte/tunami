@@ -16,10 +16,8 @@ tunami.controller = function($scope) {
     });
   }
   $scope.removeList = function(List) {
-    // @TODO better way of managing lists, we shouldn't have to do data
-    // manipulation like this in the controller.
-    $scope.lists = _.reject($scope.lists, function(v) { return v === List });
     if ($scope.playingFrom === List) $scope.setActiveSong();
+    List.destroy();
   }
   $scope.removeSong = function(Song, List) {
     List.removeSong(Song);

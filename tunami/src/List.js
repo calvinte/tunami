@@ -13,6 +13,9 @@ tunami.List = Class.extend({
   activate: function() {
     for (i in tunami._lists) tunami._lists[i].active = false;
     this.active = true;
+  },
+  destroy: function() {
+    tunami._lists = _.reject(tunami._lists, function(v) { return v === this });
   }
 });
 
