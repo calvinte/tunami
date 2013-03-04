@@ -3,6 +3,7 @@ var tunami = tunami || {};
 tunami.controller = function($scope) {
   var audio = _.first(document.getElementsByTagName('audio'));
   var render = function() { if (!$scope.$$phase) $scope.$apply() }
+  tunami.update = render;
   $scope.lists = tunami._lists;
   $scope.library = tunami.library;
   $scope.playing = {};

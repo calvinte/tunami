@@ -5,14 +5,13 @@ zip.workerScriptsPath = '../lib/zip/';
 tunami.utility = {
   extensions: ['m4p', 'mp3', 'm4a', 'aac', 'mp4', 'ogg'],
   fsSize: 4 * 1024 * 1024 * 1024,
-  getZipEntryAsDataURL: function getZipEntryAsDataURL(zipEntry, callback, progress) {
-    var tmp = '_tmp' + zipEntry.crc32;
+  createTempFile: function(callback, salt) {
+    salt = salt || Math.floor(new Date().getTime() * Math.random());
+    var tmp = '_tmp' + salt;
     requestFileSystem(TEMPORARY, tunami.utility.fsSize, function(fs) {
       function createFile() {
-        fs.root.getFile(tmp, {create: true}, function(zipFile) {
-          var writer = new zip.FileWriter(zipFile);
-          var complete = function(blob) { callback(zipFile.toURL()) };
-          zipEntry.getData(writer, complete, progress);
+        fs.root.getFile(tmp, {create: true}, function(FileEntry) {
+          callback(FileEntry);
         });
       }
 
@@ -20,6 +19,14 @@ tunami.utility = {
         fileEntry.remove(createFile, createFile);
       }, createFile);
     });
+  },
+
+  getZipEntryAsDataURL: function (zipEntry, callback, progress) {
+    tunami.utility.createTempFile(function(FileEntry) {
+      var writer = new zip.FileWriter(FileEntry);
+      var complete = function(blob) { callback(FileEntry.toURL()) };
+      zipEntry.getData(writer, complete, progress);
+    }, zipEntry.crc32);
   },
   confirmValidFileName: function confirmValidFileName(name) {
     var valid;
@@ -30,12 +37,16 @@ tunami.utility = {
     valid = valid && name.indexOf('/.') == -1;
     return valid;
   },
-  readZip: function readZip(file, callback) {
+  sanitizeFileName: function(name) {
+    name = name.replace(/\.(?=.*?\.)|\//g, '-');
+    return name;
+  },
+  readZip: function readZip(file, callback, onError) {
     zip.createReader(new zip.BlobReader(file), function(zipReader) {
       zipReader.getEntries(function(entries) {
         callback(entries);
       });
-    });
+    }, onError);
   },
   loadZipAsList: function unpackZip(file, callback) {
     List = new tunami.List(file.name);

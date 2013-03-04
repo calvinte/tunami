@@ -18,7 +18,7 @@ tunami.List = Class.extend({
     var self = this;
     tunami._lists = _.reject(tunami._lists, function(v) { return v === self });
   },
-  importZip: function(file, callback) {
+  importZip: function(file, callback, onError) {
     var self = this;
     tunami.utility.readZip(file, function(entries) {
       for (var i in entries) {
@@ -31,8 +31,8 @@ tunami.List = Class.extend({
           self.songs.push(song);
         } catch(e) {}
       }
-      callback(self);
-    });
+      if (callback) callback(self);
+    }, onError);
   },
   importList: function(List) {
     this.songs = _.union(this.songs, List.songs);
