@@ -6,6 +6,13 @@ tunami.controller = function($scope) {
   tunami.update = render;
   $scope.lists = tunami._lists;
   $scope.library = tunami.library;
+  $scope.progressQueue = tunami.progressQueue;
+  $scope.progressQueue.interval = setInterval(function() {
+    if ($scope.progressQueue.changed) {
+      $scope.progressQueue.changed = false;
+      render();
+    }
+  }, 250);
   $scope.playing = {};
   $scope.playingFrom = {};
   $scope.addZip = function() {
@@ -45,11 +52,11 @@ tunami.controller = function($scope) {
     $scope.playingFrom = List;
     List.activate();
 
-    Song.play(audio, element, _.throttle(function(current, total) {
-      var percent = Math.round(current / total * 100) + '% ';
-      $scope.progress = percent + Song.name;
-      render();
-    }, 250), function() { return Song === $scope.playing });
+    Song.play(
+      audio,
+      element,
+      function() { return Song === $scope.playing }
+    );
   }
 }
 

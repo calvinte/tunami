@@ -15,16 +15,16 @@ tunami.Song = Class.extend({
     this.type = tunami.utility.getMimeTypeFromExtension(extension);
     this.entry = entry;
   },
-  getUrl: function(callback, progress) {
+  getUrl: function(callback) {
     var song = this;
     if (!this.url) {
       tunami.utility.getZipEntryAsDataURL(this.entry, function(url) {
         song.url = url;
         callback();
-      }, progress);
+      });
     } else callback();
   },
-  play: function(audio, source, progress, validator) {
+  play: function(audio, source, validator) {
     var song = this;
     this.getUrl(function() {
       // Make sure the user hasn't clicked another title while we were away.
@@ -34,7 +34,7 @@ tunami.Song = Class.extend({
       source.src = song.url;
       audio.appendChild(source);
       audio.play();
-    }, progress);
+    });
   }
 });
 

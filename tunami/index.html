@@ -8,7 +8,11 @@
     <script src="src/main.js"></script>
   </head>
   <body ng-csp ng-controller="tunami.controller">
-    <p>&nbsp;{{progress}}</p>
+    <ul>
+      <li ng-repeat="QueueItem in progressQueue.items">
+        {{QueueItem.progress}}
+      </li>
+    </ul>
     <label>Add List: 
       <input ng-click="addZip()" ng-model="zip" type="file" accept="application/zip">
     </label>

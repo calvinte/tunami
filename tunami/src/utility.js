@@ -21,10 +21,11 @@ tunami.utility = {
     });
   },
 
-  getZipEntryAsDataURL: function (zipEntry, callback, progress) {
+  getZipEntryAsDataURL: function (zipEntry, callback) {
     tunami.utility.createTempFile(function(FileEntry) {
-      var writer = new zip.FileWriter(FileEntry);
-      var complete = function(blob) { callback(FileEntry.toURL()) };
+      var writer = new zip.FileWriter(FileEntry),
+          complete = function(blob) { callback(FileEntry.toURL()) },
+          progress = new tunami.progressQueue.Item(zipEntry.filename);
       zipEntry.getData(writer, complete, progress);
     }, zipEntry.crc32);
   },

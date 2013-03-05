@@ -1,6 +1,11 @@
 var tunami = tunami || {};
 var requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
 tunami.library = new tunami.List('library');
+tunami.library.str = {
+  PREP_WRITE_LIBRARY: 'Preparing to write library to the disk.',
+  WRITE_LIBRARY: 'Writing library to disk.',
+  ADDING: function(str) { return 'Adding `' + str + '`.' },
+}
 
 requestFileSystem(PERSISTENT, tunami.utility.fsSize, function(fs) {
   var dirName = tunami.library.name, self = tunami.library;
@@ -60,6 +65,7 @@ tunami.library.Archive = function Archive(entry) {
 }
 
 tunami.library.addSongToArchive = function(Song, archive, callback) {
+  var self = this;
   tunami.utility.createTempFile(function(FileEntry) {
     var writer = new zip.FileWriter(FileEntry);
     var complete = function(blob) {
@@ -67,23 +73,21 @@ tunami.library.addSongToArchive = function(Song, archive, callback) {
       archive.fs.root.addBlob(name, blob);
       callback();
     };
-    Song.entry.getData(writer, complete, function() {});
+    var progress = new tunami.progressQueue.Item(self.str.ADDING(Song.name));
+    Song.entry.getData(writer, complete, progress);
   });
 }
 
 tunami.library.saveArchive = function(archive) {
+  var self = this;
   archive.FileEntry.createWriter(function(fileWriter) {
-    fileWriter.onwriteend = function(e) {
-      console.log('Write completed.');
-    };
-
-    fileWriter.onerror = function(e) {
-      console.log('Write failed: ' + e.toString());
-    };
+    var exportProgress = new tunami.progressQueue.Item(self.str.PREP_WRITE_LIBRARY),
+        writerProgress = new tunami.progressQueue.Item(self.str.WRITE_LIBRARY);
+    fileWriter.onprogress = writerProgress;
 
     archive.fs.root.exportBlob(function(Blob) {
       fileWriter.write(Blob);
-    }, function(c, t) {}, function(e) {console.log(e)});
+    }, exportProgress, function(e) { throw(e) });
   });
 }
 
@@ -110,11 +114,11 @@ tunami.library.importList = function(List) {
       archive = archives[archiveIndex];
       (function recurse(Song) {
         self.addSongToArchive(Song, archive, function(e) {
-          var next = List.songs[++i];
+          var next = List.songs[++songIndex];
           if (next) recurse(next);
           else tunami.library.saveArchive(archive);
         });
-      })(List.songs[i]);
+      })(List.songs[songIndex]);
     });
   })(this);
 }
