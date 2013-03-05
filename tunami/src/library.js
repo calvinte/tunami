@@ -106,17 +106,31 @@ tunami.library.importList = function(List) {
   this.songs = _.union(this.songs, List.songs);
   (function getArchives(self) {
     tunami.library.listArchives(function(archives) {
-      var songIndex = 0, archiveIndex = 0, song, archive;
+      var songIndex = 0,
+          completedSongIndex = 0,
+          consecutiveSongsThreshold = 8,
+          archiveIndex = 0,
+          song,
+          archive;
       if (!archives.length) {
         self.createArchive(archives.length++, getArchives);
         return;
       }
       archive = archives[archiveIndex];
       (function recurse(Song) {
+        function getNext() {
+          // Do a couple of these simultaneously.
+          if (songIndex - completedSongIndex < consecutiveSongsThreshold) {
+            var next = List.songs[++songIndex];
+            if (next) recurse(next);
+          }
+        }
+        getNext();
         self.addSongToArchive(Song, archive, function(e) {
-          var next = List.songs[++songIndex];
-          if (next) recurse(next);
-          else tunami.library.saveArchive(archive);
+          if (List.songs.length == ++completedSongIndex) {
+            // Save the archive, once we're finished.
+            tunami.library.saveArchive(archive)
+          } else getNext();
         });
       })(List.songs[songIndex]);
     });
