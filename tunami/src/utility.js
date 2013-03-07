@@ -49,10 +49,6 @@ tunami.utility = {
       });
     }, onError);
   },
-  loadZipAsList: function unpackZip(file, callback) {
-    List = new tunami.List(file.name);
-    List.importZip(file, callback);
-  },
   getExtensionFromFileName: function getExtensionFromFileName(string) {
     return _.last(string.split('.'));
   },

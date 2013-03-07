@@ -1,6 +1,6 @@
 var tunami = tunami || {};
 var requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
-tunami.library = new tunami.List('library');
+tunami.library = new tunami.ZipList('library');
 tunami.library.str = {
   PREP_WRITE_LIBRARY: 'Preparing to write library to the disk.',
   WRITE_LIBRARY: 'Writing library to disk.',
@@ -16,7 +16,7 @@ requestFileSystem(PERSISTENT, tunami.utility.fsSize, function(fs) {
       (function recurse(i) {
         var archive = archives[i];
         var FileEntry = archives[i].FileEntry;
-          
+
         FileEntry.file(function(File) {
           archive.fs.root.importZip(new zip.BlobReader(File), function() {
             self.importZip(File);
@@ -31,14 +31,6 @@ requestFileSystem(PERSISTENT, tunami.utility.fsSize, function(fs) {
   fs.root.getDirectory(dirName, options, readFiles, readFiles);
 });
 
-tunami.library.getArchiveNameFromIndex = function(index) {
-  return 'part-' + index + '.zip';
-}
-
-tunami.library.getArchiveIndexFromName = function(name) {
-  return parseInt(name.replace(/[^0-9]/g, ''));
-}
-
 tunami.library.listArchives = function(callback) {
   var self = this;
   this.directory.createReader().readEntries(function(entries) {
@@ -49,19 +41,10 @@ tunami.library.listArchives = function(callback) {
         return v.FileEntry.name == entry.name;
       }));
       if (exists) continue;
-      new tunami.library.Archive(entry);
+      new tunami.library.Archive({FileEntry: entry});
     }
     callback(tunami.library._archives);
   });
-}
-
-tunami.library._archives = [];
-tunami.library.Archive = function Archive(entry) {
-  var self = tunami.library;
-  this.index = self.getArchiveIndexFromName(entry.name),
-  this.FileEntry = entry;
-  this.fs = new zip.fs.FS();
-  self._archives.push(this);
 }
 
 tunami.library.addSongToArchive = function(Song, archive, callback) {
@@ -91,15 +74,7 @@ tunami.library.saveArchive = function(archive) {
   });
 }
 
-tunami.library.createArchive = function(index) {
-  var options = {create: true},
-      fileName = this.getArchiveNameFromIndex(index);
-
-  function callback() {};
-
-  this.directory.getFile(fileName, options, callback, function() {
-    throw new Error('Could not create new archive ' + filename);
-  });
+tunami.library.createArchive = function(index, callback) {
 }
 
 tunami.library.importList = function(List) {
@@ -113,7 +88,7 @@ tunami.library.importList = function(List) {
           song,
           archive;
       if (!archives.length) {
-        self.createArchive(archives.length++, getArchives);
+        new self.Archive({callback: getArchives});
         return;
       }
       archive = archives[archiveIndex];

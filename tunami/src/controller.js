@@ -18,7 +18,7 @@ tunami.controller = function($scope) {
   $scope.addZip = function() {
     event.target.addEventListener('change', function() {
       var files = this.files;
-      tunami.utility.loadZipAsList(files[0], function(List) {
+      new tunami.ZipList(files[0], function(List) {
         List.activate();
         render();
       });
