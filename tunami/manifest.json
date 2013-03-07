@@ -3,6 +3,14 @@
   "name": "Tunami",
   "version": "1",
   "minimum_chrome_version": "24",
+  "icons": {
+    "512": "images/icon_512.png",
+    "256": "images/icon_256.png",
+    "128": "images/icon_128.png",
+    "64": "images/icon_64.png",
+    "32": "images/icon_32.png",
+    "16": "images/icon_16.png"
+  },
   "app": {
     "background": {
       "scripts" : [
