@@ -78,6 +78,7 @@ tunami.library.createArchive = function(index, callback) {
 }
 
 tunami.library.importList = function(List) {
+  var self = this;
   this.songs = _.union(this.songs, List.songs);
   (function getArchives(self) {
     tunami.library.listArchives(function(archives) {

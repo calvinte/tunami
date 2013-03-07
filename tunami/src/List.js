@@ -42,6 +42,7 @@ tunami.ZipList = tunami.List.extend({
        *  callback as Function (optional)
        */
       init: function(options) {
+        var self = this;
         options = options || {};
         // Currently this only works for library, will update.
         this.fs = new zip.fs.FS();
@@ -51,9 +52,11 @@ tunami.ZipList = tunami.List.extend({
           this.index = this.getArchiveIndexFromName(this.FileEntry.name);
         } else {
           List.listArchives(function(archives) {
-            var fileName = this.getArchiveNameFromIndex(archives.length++);
-            this.directory.getFile(fileName, {create: true}, function(entry) {
-              this.FileEntry = entry;
+            console.log(self);
+            var fileName = self.getArchiveNameFromIndex(archives.length++);
+            // @TODO Only works for `tunami.library`.
+            List.directory.getFile(fileName, {create: true}, function(entry) {
+              self.FileEntry = entry;
               if (options.callback) options.callback();
             }, function() {
               throw new Error('Could not create new archive ' + filename);
