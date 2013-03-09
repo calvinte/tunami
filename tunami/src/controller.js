@@ -15,10 +15,10 @@ tunami.controller = function($scope) {
   }, 250);
   $scope.playing = {};
   $scope.playingFrom = {};
-  $scope.addZip = function() {
+  $scope.createList = function() {
     event.target.addEventListener('change', function() {
       var files = this.files;
-      new tunami.ZipList(files[0], function(List) {
+      new tunami.List('New List', files, function(List) {
         List.activate();
         render();
       });

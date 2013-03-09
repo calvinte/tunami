@@ -1,28 +1,31 @@
 var tunami = tunami || {};
 
 tunami.Song = Class.extend({
-  init: function(name, entry) {
-   var extension = tunami.utility.getExtensionFromFileName(name);
-    if (tunami.utility.extensions.indexOf(extension) == -1) {
+  init: function(File) {
+    this.File = File;
+    this.name = this.File.name;
+    this.extension = tunami.utility.getExtensionFromFileName(this.name);
+    this.type = tunami.utility.getMimeTypeFromExtension(this.extension);
+    if (tunami.utility.extensions.indexOf(this.extension) == -1) {
       throw new Error('Unacceptable extension');
     }
-
-    if (!tunami.utility.confirmValidFileName(name)) {
+    if (!tunami.utility.confirmValidFileName(this.name)) {
       throw new Error('Invalid filename');
     }
-
-    this.name = name;
-    this.type = tunami.utility.getMimeTypeFromExtension(extension);
-    this.entry = entry;
   },
   getUrl: function(callback) {
-    var song = this;
+    var Song = this;
     if (!this.url) {
-      tunami.utility.getZipEntryAsDataURL(this.entry, function(url) {
-        song.url = url;
+      var reader = new FileReader();
+      reader.onloadend = function(e) {
+        Song.url = e.target.result;
         callback();
-      });
-    } else callback();
+      }
+      reader.onprogress = new tunami.progressQueue.Item(this.name);
+      reader.readAsDataURL(this.File);
+    } else {
+      callback();
+    }
   },
   play: function(audio, source, validator) {
     var song = this;
