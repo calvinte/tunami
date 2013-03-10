@@ -18,6 +18,13 @@ tunami.library = new (tunami.List.extend({
         });
       });
     })()
+  },
+  removeSong: function(Song) {
+    var self = this;
+    this._super(Song);
+    this.directory.getFile(Song.name, {create: false}, function(FileEntry) {
+      FileEntry.remove(function() {});
+    });
   }
 }))();
 
