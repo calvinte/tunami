@@ -20,8 +20,17 @@
     <ul>
       <li ng-repeat="List in lists">
         <strong ng-click="activateList(List)">{{List.name}}</strong>
-        <a ng-click="removeList(List)">Eject</a>
-        <a ng-click="library.importList(List)">Import to Library</a>
+        <div class="listOptions" ng-show="List != library">
+          <a ng-click="removeList(List)">Eject</a>
+          <a ng-click="renameListMode = true; renameListValue = List.name">Rename</a>
+          <form ng-submit="renameListMode = false">
+            <input
+              ng-show="renameListMode"
+              ng-model="renameListValue"
+              ng-change="List.name = renameListValue" />
+          </form>
+          <a ng-click="library.importList(List)">Import to Library</a>
+        </div>
         <ul ng-show="List.active">
           <li ng-repeat="Song in List.songs">
             <a ng-click="setActiveSong(Song, List)">{{Song.name}}</a>

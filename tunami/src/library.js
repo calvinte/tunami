@@ -2,7 +2,7 @@ var tunami = tunami || {};
 var requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
 tunami.library = new (tunami.List.extend({
   init: function() {
-    this._super('library');
+    this._super('Library');
   },
   importList: function(List) {
     var songs = List.songs, self = this, i = 0;

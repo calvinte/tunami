@@ -3,6 +3,7 @@ var tunami = tunami || {};
 tunami.controller = function($scope) {
   var audio = _.first(document.getElementsByTagName('audio'));
   var render = function() { if (!$scope.$$phase) $scope.$apply() }
+  tunami.scope = $scope;
   tunami.update = render;
   $scope.lists = tunami._lists;
   $scope.library = tunami.library;
@@ -29,6 +30,11 @@ tunami.controller = function($scope) {
     if ($scope.playingFrom === List) $scope.setActiveSong();
     List.destroy();
     $scope.lists = tunami._lists;
+    render();
+  }
+  $scope.renameList = function(List) {
+    List.name = $scope.renameListValue;
+    console.log($scope.renameListValue);
     render();
   }
   $scope.removeSong = function(Song, List) {
