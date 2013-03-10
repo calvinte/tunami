@@ -1,8 +1,0 @@
-html, body {
-  overflow-y: scroll;
-}
-
-.listOptions, .listOptions form {
-  display: inline;
-}
-

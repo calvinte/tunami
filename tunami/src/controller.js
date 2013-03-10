@@ -34,8 +34,31 @@ tunami.controller = function($scope) {
   }
   $scope.renameList = function(List) {
     List.name = $scope.renameListValue;
-    console.log($scope.renameListValue);
     render();
+  }
+  $scope.songSelectBehaviour = function(Song, List) {
+    // Logic controls multi-select behaviour.
+    if (event.metaKey) {
+      // Pressing control/command.
+      Song.ngSelected = true;
+    } else if (event.shiftKey) {
+      // Pressing shift.
+      var i = List.songs.indexOf($scope.lastSongSelected);
+      var direction = List.songs.indexOf(Song) > i;
+      if (i == -1) return;
+      for (i; i < List.songs.length; i += (direction ? 1 : -1)) {
+        List.songs[i].ngSelected = true;
+        if (List.songs[i] === Song) break;
+      }
+    } else {
+      // Not pressing and modifier keys.
+      var i = 0;
+      for (i; i < List.songs.length; i++) {
+        if (List.songs[i] === Song) List.songs[i].ngSelected = true;
+        else List.songs[i].ngSelected = false;
+      }
+    }
+    $scope.lastSongSelected = Song;
   }
   $scope.removeSong = function(Song, List) {
     List.removeSong(Song);

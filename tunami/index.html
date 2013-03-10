@@ -1,11 +1,12 @@
 <!doctype html>
 <html ng-app>
   <head>
-    <link href="styles/main.css" rel="stylesheet" />
+    <link href="styles/main.less" rel="stylesheet/less" />
     <script src="lib/underscore.min.js"></script>
     <script src="lib/angular.min.js"></script>
     <script src="src/controller.js"></script>
     <script src="src/main.js"></script>
+    <script src="lib/less.min.js"></script>
   </head>
   <body ng-csp ng-controller="tunami.controller">
     <ul>
@@ -20,7 +21,7 @@
     <ul>
       <li ng-repeat="List in lists">
         <strong ng-click="activateList(List)">{{List.name}}</strong>
-        <div class="listOptions" ng-show="List != library">
+        <div class="list-options" ng-show="List != library">
           <a ng-click="removeList(List)">Eject</a>
           <a ng-click="renameListMode = true; renameListValue = List.name">Rename</a>
           <form ng-submit="renameListMode = false">
@@ -31,12 +32,20 @@
           </form>
           <a ng-click="library.importList(List)">Import to Library</a>
         </div>
-        <ul ng-show="List.active">
-          <li ng-repeat="Song in List.songs">
-            <a ng-click="setActiveSong(Song, List)">{{Song.name}}</a>
-            <a ng-click="removeSong(Song, List)">x</a>
-          </li>
-        </ul>
+        <form class="list-songs">
+          <ul ng-show="List.active">
+            <li ng-repeat="Song in List.songs">
+              <label ng-class="(Song.ngSelected && 'checked')">
+                <input
+                  type="checkbox"
+                  ng-model="Song.ngSelected"
+                  ng-click="songSelectBehaviour(Song, List)">
+                <a ng-click="setActiveSong(Song, List)">{{Song.name}}</a>
+              </label>
+              <a ng-click="removeSong(Song, List)">Remove</a>
+            </li>
+          </ul>
+        </form>
       </li>
     </ul>
     <audio controls />

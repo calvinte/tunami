@@ -1,0 +1,24 @@
+html, body {
+  overflow-y: scroll;
+}
+
+.list-options form {
+  display: inline;
+}
+
+.list-songs {
+  width: 80%;
+  label {
+    display: block;
+    width: 100%;
+    &.checked {
+      background: #CCC;
+      a { pointer-events: auto }
+    }
+    a { 
+      pointer-events: none;
+      position: absolute
+    }
+  }
+}
+
