@@ -40,7 +40,8 @@ tunami.controller = function($scope) {
     // Logic controls multi-select behaviour.
     if (event.metaKey) {
       // Pressing control/command.
-      Song.ngSelected = true;
+      if (Song.ngSelected) Song.ngSelected = true;
+      else Song.ngSelected = false;
     } else if (event.shiftKey) {
       // Pressing shift.
       var i = List.songs.indexOf($scope.lastSongSelected);
@@ -70,6 +71,11 @@ tunami.controller = function($scope) {
   $scope.setActiveSong = function(Song, List) {
     var element = document.createElement('source');
 
+    if (event.metaKey) {
+      Song.ngSelected = !Song.ngSelected;
+      $scope.songSelectBehaviour(Song, List);
+      return;
+    }
     // Stop any audio from playing, and remove all sources.
     audio.pause();
     audio.innerHTML = '';
