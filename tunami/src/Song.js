@@ -15,17 +15,8 @@ tunami.Song = Class.extend({
   },
   getUrl: function(callback) {
     var Song = this;
-    if (!this.url) {
-      var reader = new FileReader();
-      reader.onloadend = function(e) {
-        Song.url = e.target.result;
-        callback();
-      }
-      reader.onprogress = new tunami.progressQueue.Item(this.name);
-      reader.readAsDataURL(this.File);
-    } else {
-      callback();
-    }
+    this.url = this.url || URL.createObjectURL(this.File);
+    callback();
   },
   play: function(audio, source, validator) {
     var song = this;
