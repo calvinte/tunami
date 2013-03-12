@@ -59,7 +59,7 @@ tunami.controller = function($scope) {
         else List.songs[i].ngSelected = false;
       }
     }
-    $scope.lastSongSelected = Song;
+    if (Song.ngSelected) $scope.lastSongSelected = Song;
   }
   $scope.removeSong = function(Song, List) {
     List.removeSong(Song);
@@ -71,7 +71,7 @@ tunami.controller = function($scope) {
   $scope.setActiveSong = function(Song, List) {
     var element = document.createElement('source');
 
-    if (event.metaKey) {
+    if (event.metaKey || event.shiftKey) {
       Song.ngSelected = !Song.ngSelected;
       $scope.songSelectBehaviour(Song, List);
       return;
