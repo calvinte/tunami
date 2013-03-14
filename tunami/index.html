@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app>
+<html ng-app="tunami">
   <head>
     <link href="styles/main.less" rel="stylesheet/less" />
     <script src="lib/underscore.min.js"></script>
@@ -19,7 +19,7 @@
     </label>
     <h3>Lists</h3>
     <ul>
-      <li ng-repeat="List in lists">
+      <li ng-repeat="List in lists" attach-list>
         <strong ng-click="activateList(List)">{{List.name}}</strong>
         <div class="list-options" ng-show="List != library">
           <a ng-click="removeList(List)">Eject</a>
@@ -34,7 +34,7 @@
         </div>
         <form class="list-songs">
           <ul ng-show="List.active">
-            <li ng-repeat="Song in List.songs">
+            <li ng-repeat="Song in List.songs" attach-song>
               <label ng-class="(Song.ngSelected && 'checked')">
                 <input
                   type="checkbox"
@@ -42,7 +42,6 @@
                   ng-click="songSelectBehaviour(Song, List)">
                 <a ng-click="setActiveSong(Song, List)">{{Song.name}}</a>
               </label>
-              <a ng-click="removeSong(Song, List)">Remove</a>
             </li>
           </ul>
         </form>

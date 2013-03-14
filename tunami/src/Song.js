@@ -6,6 +6,7 @@ tunami.Song = Class.extend({
     this.name = this.File.name;
     this.extension = tunami.utility.getExtensionFromFileName(this.name);
     this.type = tunami.utility.getMimeTypeFromExtension(this.extension);
+    this.elements = [];
     if (tunami.utility.extensions.indexOf(this.extension) == -1) {
       throw new Error('Unacceptable extension');
     }

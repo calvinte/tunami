@@ -18,6 +18,7 @@
         "lib/Class.js",
         "src/background.js",
         "src/utility.js",
+        "src/contextMenu.js",
         "src/progressQueue.js",
         "src/Song.js",
         "src/List.js",
@@ -26,7 +27,8 @@
     }
   },
   "permissions": [
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "contextMenus"
   ]
 }
 

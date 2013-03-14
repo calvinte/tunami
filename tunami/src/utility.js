@@ -30,6 +30,20 @@ tunami.utility = {
       ogg: 'audio/ogg'
     }
     return audioTypes[extension];
+  },
+  elementsHaveChild: function elementHasChild(elements, child) {
+    var element, i = 0;
+    for (i; i < elements.length; i++) {
+      element = elements[i];
+      var node = child.parentNode;
+      while (node != null) {
+        if (node === element) {
+          return true;
+        }
+        node = node.parentNode;
+      }
+    }
+    return false;
   }
 };
 

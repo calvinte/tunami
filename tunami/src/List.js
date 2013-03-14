@@ -3,13 +3,29 @@ var tunami = tunami || {};
 tunami._lists = [];
 tunami.List = Class.extend({
   init: function(name, files, callback) {
+    var List = this;
     this.name = name;
     this.songs = [];
     files = files || [];
     for (var i = 0; i < files.length; i++) this.addSong(files[i]);
     tunami._lists.push(this);
     if (callback) callback(this);
+
+    this.contextMenuItems = [];
+    this.contextMenuItems.push(new tunami.contextMenu.Item(
+      File.name,
+      'Remove this song',
+      function(event) {
+        List.removeSong(_.find(List.songs, function(Song) {
+          return tunami.utility.elementsHaveChild(Song.elements, event.target);
+        }));
+      },
+      function(event) {
+        return tunami.utility.elementsHaveChild(List.elements, event.target);
+      }
+    ));
   },
+  elements: [],
   addSong: function(File) {
     this.songs.push(new tunami.Song(File));
   },

@@ -1,5 +1,21 @@
 var tunami = tunami || {};
 
+tunami.ngModule = angular.module('tunami', [])
+  .directive('attachSong', function() {
+    return function(scope, element, attrs) {
+      if (scope.Song.elements.indexOf(element[0]) == -1) {
+        scope.Song.elements.push(element[0]);
+      }
+    }
+  })
+  .directive('attachList', function() {
+    return function(scope, element, attrs) {
+      if (scope.List.elements.indexOf(element[0]) == -1) {
+        scope.List.elements.push(element[0]);
+      }
+    }
+  });
+
 tunami.controller = function($scope) {
   var audio = _.first(document.getElementsByTagName('audio'));
   var render = function() { if (!$scope.$$phase) $scope.$apply() }
@@ -39,9 +55,7 @@ tunami.controller = function($scope) {
   $scope.songSelectBehaviour = function(Song, List) {
     // Logic controls multi-select behaviour.
     if (event.metaKey) {
-      // Pressing control/command.
-      if (Song.ngSelected) Song.ngSelected = true;
-      else Song.ngSelected = false;
+      Song.ngSelected = !!Song.ngSelected;
     } else if (event.shiftKey) {
       // Pressing shift.
       var i = List.songs.indexOf($scope.lastSongSelected);
@@ -93,5 +107,6 @@ tunami.controller = function($scope) {
       function() { return Song === $scope.playing }
     );
   }
+  chrome.contextMenus.onClicked.addListener(render);
 }
 
