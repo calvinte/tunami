@@ -32,8 +32,17 @@ tunami.utility = {
     }
     return audioTypes[extension];
   },
+  /**
+   * @param elements as Array.
+   * @param child as HTMLElement or Event.
+   * @return Boolean.
+   */
   elementsHaveChild: function elementHasChild(elements, child) {
     var element, i = 0;
+
+    // Condition allows function to accept Event objects.
+    if (child instanceof Event) child = child.target;
+
     for (i; i < elements.length; i++) {
       element = elements[i];
       var node = child.parentNode;

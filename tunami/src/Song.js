@@ -14,6 +14,9 @@ tunami.Song = Class.extend({
       throw new Error('Invalid filename');
     }
   },
+  hasElement: function(element) {
+    return tunami.utility.elementsHaveChild(this.elements, element);
+  },
   getUrl: function(callback) {
     var Song = this;
     this.url = this.url || URL.createObjectURL(this.File);

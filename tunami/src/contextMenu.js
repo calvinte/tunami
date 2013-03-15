@@ -2,13 +2,13 @@ var tunami = tunami || {};
 tunami.contextMenu = {
   items: [],
   Item: Class.extend({
-    init: function(title, callback, validator) {
+    init: function(title, validator, callback) {
       var menu = tunami.contextMenu;
       menu.items.push(this);
       this.salt = tunami.utility.salt();
       this.title = title;
-      this.callback = callback;
       this.validator = validator;
+      this.callback = callback;
     }
   })
 };
