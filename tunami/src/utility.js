@@ -4,6 +4,7 @@ var requestFileSystem = window.requestFileSystem || window.webkitRequestFileSyst
 tunami.utility = {
   extensions: ['m4p', 'mp3', 'm4a', 'aac', 'mp4', 'ogg'],
   fsSize: 4 * 1024 * 1024 * 1024,
+  salt: function() { return Math.floor(new Date().getTime() * Math.random()) },
   confirmValidFileName: function confirmValidFileName(name) {
     var valid;
 

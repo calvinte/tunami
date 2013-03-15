@@ -107,6 +107,5 @@ tunami.controller = function($scope) {
       function() { return Song === $scope.playing }
     );
   }
-  chrome.contextMenus.onClicked.addListener(render);
 }
 

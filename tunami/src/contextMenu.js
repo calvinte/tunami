@@ -2,10 +2,10 @@ var tunami = tunami || {};
 tunami.contextMenu = {
   items: [],
   Item: Class.extend({
-    init: function(id, title, callback, validator) {
+    init: function(title, callback, validator) {
       var menu = tunami.contextMenu;
       menu.items.push(this);
-      this.id = id;
+      this.salt = tunami.utility.salt();
       this.title = title;
       this.callback = callback;
       this.validator = validator;
@@ -23,16 +23,16 @@ window.addEventListener('index_launch', function() {
       if (item.validator(event)) {
         chrome.contextMenus.create({
           contexts: ['all'],
-          id: item.id,
+          id: item.salt.toString(),
           title: item.title
         });
+        (function(item, event) {
+          chrome.contextMenus.onClicked.addListener(function(info) {
+            if (info.menuItemId == item.salt) item.callback(event);
+            chrome.contextMenus.onClicked.removeListener(arguments.callee);
+          });
+        })(item, event);
       }
-      (function(item, event) {
-        chrome.contextMenus.onClicked.addListener(function(info) {
-          if (info.menuItemId == item.id) item.callback(event);
-          chrome.contextMenus.onClicked.removeListener(arguments.callee);
-        });
-      })(item, event);
     }
   });
 });
