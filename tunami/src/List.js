@@ -12,20 +12,38 @@ tunami.List = Class.extend({
     tunami._lists.push(this);
     if (callback) callback(this);
 
-    this.contextMenuItems = [];
-    this.contextMenuItems.push(new tunami.contextMenu.Item(
-      'Remove this song',
-      function(event) {
-        var Song = _.find(List.songs, function(Song) {
-          return tunami.utility.elementsHaveChild(Song.elements, event.target);
-        });
-        List.removeSong(Song);
-        tunami.update();
-      },
-      function(event) {
-        return tunami.utility.elementsHaveChild(List.elements, event.target);
-      }
-    ));
+    this.contextMenuItems = [
+      new tunami.contextMenu.Item(
+        'Remove This Song',
+        function(event) {
+          var Song = _.find(List.songs, function(Song) {
+            return tunami.utility.elementsHaveChild(Song.elements, event.target);
+          });
+          List.removeSong(Song);
+          tunami.update();
+        },
+        function(event) {
+          return tunami.utility.elementsHaveChild(List.elements, event.target);
+        }
+      ),
+      new tunami.contextMenu.Item(
+        'Remove Selected Songs',
+        function(event) {
+          var songs = _.filter(List.songs, function(Song) {
+            return Song.ngSelected
+          });
+          for (var i = 0; i < songs.length; i++) List.removeSong(songs[i]);
+          tunami.update();
+        },
+        function(event) {
+          var songs = _.filter(List.songs, function(Song) {
+            return Song.ngSelected
+          });
+          if (songs.length < 2) return false;
+          return tunami.utility.elementsHaveChild(List.elements, event.target);
+        }
+     )
+    ]
   },
   addSong: function(File) {
     this.songs.push(new tunami.Song(File));

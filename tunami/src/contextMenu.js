@@ -26,14 +26,14 @@ window.addEventListener('index_launch', function() {
           id: item.salt.toString(),
           title: item.title
         });
-        (function(item, event) {
-          chrome.contextMenus.onClicked.addListener(function(info) {
-            if (info.menuItemId == item.salt) item.callback(event);
-            chrome.contextMenus.onClicked.removeListener(arguments.callee);
-          });
-        })(item, event);
       }
     }
+    chrome.contextMenus.onClicked.addListener(function(info) {
+      _.find(tunami.contextMenu.items, function(Item) {
+        return Item.salt == info.menuItemId
+      }).callback(event);
+      chrome.contextMenus.onClicked.removeListener(arguments.callee);
+    });
   });
 });
 
